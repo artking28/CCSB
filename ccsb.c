@@ -42,21 +42,18 @@ StrBuf newSB(char* str) {
 
 int writeSB(StrBuf sb, char* str) {
 	size_t size = strlen(str);
-    sb->used += size;
-	if(sb->used < sb->capacity) {
-	    memcpy(&sb->content[sb->used], str, size);
-	    // sb->used += size;
-		return 0;
+	if(size + sb->used >= sb->capacity) {
+		sb->capacity = (sb->used + size) * sb->growFactor;
+		char* novo = malloc(sb->capacity*sizeof(char));
+		if(novo == NULL) {
+		    return -1;
+		}
+		memcpy(novo, sb->content, sb->used);
+		free(sb->content);
+		sb->content = novo;
 	}
-	sb->capacity = (sb->used) * sb->growFactor;
-	char* novo = malloc(sb->capacity*sizeof(char));
-	if(novo == NULL) {
-	    perror("fail during memory allocation.\n");
-	    return -1;
-	}
-	memcpy(novo, sb->content, sb->used);
-	free(sb->content);
-	sb->content = novo;
+	memcpy(&sb->content[sb->used], str, size);
+	sb->used += size;
 	return 0;
 }
 

@@ -17,7 +17,7 @@ Here is a simple example demonstrating how to use CCSB:
 
 int main(void) {
     // Create a new string buffer
-    StrBuf sb = NewSB("Hello");
+    StrBuf sb = newSB("Hello");
     if (sb == NULL) {
         fprintf(stderr, "Failed to create string buffer.\n");
         return 1;
