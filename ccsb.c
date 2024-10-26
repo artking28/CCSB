@@ -3,22 +3,32 @@
 #include <stdlib.h>
 #include <string.h>
 
+static float defaultGrow = 2.0;
+
 struct strBuf {
     char* content;
     int capacity;
     int used;
+    float growFactor;
 };
 
-StrBuf NewSB(char* str) {
-	size_t size = strlen(str);
+StrBuf newGrowFactorSB(char* str, float growFactor) {
+   	size_t size = strlen(str);
 	StrBuf sb = malloc(sizeof(struct strBuf));
 	if(sb == NULL) {
+        perror("fail during memory allocation.\n");
 	    return NULL;
 	}
-	sb->capacity = size*2;
+	if(growFactor < 1 || growFactor > 10) {
+	    perror("growFactor must to be between 1 and 10.\n");
+	    return NULL;
+	}
+	sb->growFactor = growFactor;
+	sb->capacity = size*sb->growFactor;
 	sb->used = size;
-	sb->content = malloc(2*size);
+	sb->content = malloc(sizeof(char)*sb->capacity);
 	if(sb->content == NULL) {
+	    perror("fail during memory allocation.\n");
 	    free(sb);
 	    return NULL;
 	}
@@ -26,20 +36,27 @@ StrBuf NewSB(char* str) {
 	return sb;
 }
 
+StrBuf newSB(char* str) {
+	return newGrowFactorSB(str, defaultGrow);
+}
+
 int writeSB(StrBuf sb, char* str) {
 	size_t size = strlen(str);
-	if(size + sb->used >= sb->capacity) {
-		sb->capacity = (sb->used + size) * 2;
-		char* novo = malloc(sb->capacity*sizeof(char));
-		if(novo == NULL) {
-		    return -1;
-		}
-		memcpy(novo, sb->content, sb->used);
-		free(sb->content);
-		sb->content = novo;
+    sb->used += size;
+	if(sb->used < sb->capacity) {
+	    memcpy(&sb->content[sb->used], str, size);
+	    // sb->used += size;
+		return 0;
 	}
-	memcpy(&sb->content[sb->used], str, size);
-	sb->used += size;
+	sb->capacity = (sb->used) * sb->growFactor;
+	char* novo = malloc(sb->capacity*sizeof(char));
+	if(novo == NULL) {
+	    perror("fail during memory allocation.\n");
+	    return -1;
+	}
+	memcpy(novo, sb->content, sb->used);
+	free(sb->content);
+	sb->content = novo;
 	return 0;
 }
 
@@ -57,6 +74,7 @@ int setCapSB(StrBuf sb, int size) {
     sb->capacity = size;
 	char* novo = malloc(sb->capacity*sizeof(char));
 	if(novo == NULL) {
+	    perror("fail during memory allocation.\n");
 	    return -1;
 	}
 	memcpy(novo, sb->content, size);
@@ -69,7 +87,6 @@ int setCapSB(StrBuf sb, int size) {
 }
 
 int getCapSB(StrBuf sb) {
-    printf("%d\n", sb == NULL);
     return sb->capacity;
 }
 
@@ -80,6 +97,7 @@ int getLenSB(StrBuf sb) {
 char* getContentSB(StrBuf sb) {
 	char* ret = malloc((sb->used + 1)*sizeof(char));
 	if(ret == NULL) {
+	    perror("fail during memory allocation.\n");
 		return NULL;
 	}
 	memcpy(ret, sb->content, sb->used);
@@ -91,6 +109,7 @@ int resetSB(StrBuf sb) {
 	sb->used = 0;
 	char* novo = malloc(sb->capacity*sizeof(char));
 	if(novo == NULL) {
+	    perror("fail during memory allocation.\n");
 	    return -1;
 	}
 	free(sb->content);

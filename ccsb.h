@@ -8,7 +8,11 @@
 typedef struct strBuf *StrBuf;
 
 // Function to create a new string buffer with an initial string
-StrBuf NewSB(char*);
+// and growing factor.
+StrBuf newGrowFactorSB(char* str, float growFactor);
+
+// Function to create a new string buffer with an initial string
+StrBuf newSB(char*);
 
 // Function to write a string to the buffer
 int writeSB(StrBuf, char*);
