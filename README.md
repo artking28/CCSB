@@ -1,6 +1,6 @@
 # CCSB (Clang Custom String Buffer)
 
-**CCSB** is a simple implementation of a string buffer in C, designed to enhance performance in string manipulation. This library provides a simple and efficient interface for concatenating, inserting, and manipulating strings without the overhead of excessive memory allocation.
+**CCSB** is a simple implementation of a string buffer in C used and created by me, so I decided to share it with anyone who wants to use it. It enhances performance in string manipulation and provides a simple and efficient interface for manipulate strings without the overhead of excessive memory allocation.
 
 ## Features
 
